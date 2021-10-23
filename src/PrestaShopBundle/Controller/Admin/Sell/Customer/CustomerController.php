@@ -273,11 +273,17 @@ class CustomerController extends AbstractAdminController
      *
      * @param int $customerId
      * @param Request $request
+     * @param CustomerDiscountFilters $customerDiscountFilters
+     * @param CustomerAddressFilters $customerAddressFilters
      *
      * @return Response
      */
-    public function viewAction($customerId, Request $request)
-    {
+    public function viewAction(
+        $customerId,
+        Request $request,
+        CustomerDiscountFilters $customerDiscountFilters,
+        CustomerAddressFilters $customerAddressFilters
+    ) {
         try {
             /** @var ViewableCustomer $customerInformation */
             $customerInformation = $this->getQueryBus()->handle(new GetCustomerForViewing((int) $customerId));
@@ -306,7 +312,7 @@ class CustomerController extends AbstractAdminController
             'filters' => [
                 'id_customer' => $customerId,
             ],
-        ]);
+        ] + $customerDiscountFilters->all());
         $customerDiscountGrid = $customerDiscountGridFactory->getGrid($customerDiscountFilters);
 
         $customerAddressGridFactory = $this->get('prestashop.core.grid.factory.customer.address');
@@ -314,7 +320,7 @@ class CustomerController extends AbstractAdminController
             'filters' => [
                 'id_customer' => $customerId,
             ],
-        ]);
+        ] + $customerAddressFilters->all());
         $customerAddressGrid = $customerAddressGridFactory->getGrid($customerAddressFilters);
 
         if ($request->query->has('conf')) {

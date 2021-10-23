@@ -180,7 +180,7 @@ class CustomerCore extends ObjectModel
             'lastname' => ['type' => self::TYPE_STRING, 'validate' => 'isCustomerName', 'required' => true, 'size' => 255],
             'firstname' => ['type' => self::TYPE_STRING, 'validate' => 'isCustomerName', 'required' => true, 'size' => 255],
             'email' => ['type' => self::TYPE_STRING, 'validate' => 'isEmail', 'required' => true, 'size' => 255],
-            'passwd' => ['type' => self::TYPE_STRING, 'validate' => 'isPasswd', 'required' => true, 'size' => 255],
+            'passwd' => ['type' => self::TYPE_STRING, 'validate' => 'isPlaintextPassword', 'required' => true, 'size' => 255],
             'last_passwd_gen' => ['type' => self::TYPE_STRING, 'copy_post' => false],
             'id_gender' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId'],
             'birthday' => ['type' => self::TYPE_DATE, 'validate' => 'isBirthDate'],
@@ -790,7 +790,8 @@ class CustomerCore extends ObjectModel
                         `id_lang` = ' . (int) $idLang . '
                         AND `id_customer` = ' . (int) $this->id . '
                         AND a.`deleted` = 0
-                        AND a.`active` = 1';
+                        AND a.`active` = 1
+                    ORDER BY a.`alias`';
 
         if (null !== $idAddress) {
             $sql .= ' AND a.`id_address` = ' . (int) $idAddress;
@@ -1185,7 +1186,7 @@ class CustomerCore extends ObjectModel
         if (empty($password)) {
             $password = Tools::passwdGen(8, 'RANDOM');
         }
-        if (!Validate::isPasswd($password)) {
+        if (!Validate::isPlaintextPassword($password)) {
             return false;
         }
 
